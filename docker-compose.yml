@@ -2,7 +2,7 @@ version: "3"
 services:
   app:
     build: .
-    image: jasonblanchard/jawn-app
+    image: jasonblanchard/jawn-workspace-api
     expose:
       - '80'
     networks:
@@ -19,19 +19,5 @@ services:
     image: mongo:3.7.1
     networks:
       - backend
-  tests:
-    build: ./tests
-    environment:
-      CYPRESS_BASE_URL: http://app
-      MONGO_HOST: mongo
-      DB_NAME: jawn_test
-    networks:
-      - backend
-    volumes:
-      - ./tests/cypress/videos:/home/app/tests/cypress/videos
-      - ./tests/cypress/screenshots:/home/app/tests/cypress/screenshots
-    depends_on:
-      - mongo
-      - app
 networks:
   backend:
