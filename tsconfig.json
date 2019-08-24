@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "allowJs": true,
+        "target": "es6",
+        "lib": ["es2015", "ESNext.AsyncIterable"],
+        "noImplicitAny": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "strictNullChecks": true,
+        "noImplicitThis": true,
+        "noFallthroughCasesInSwitch": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "build/app",
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "node_modules/*",
+                "src/*"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*"
+    ]
+}

@@ -1,0 +1,37 @@
+version: "3"
+services:
+  app:
+    build: .
+    image: jasonblanchard/jawn-app
+    expose:
+      - '80'
+    networks:
+      - backend
+    environment:
+      DB_NAME: jawn_test
+      MONGO_HOST: mongo
+      PORT: '8081'
+      LOG_LEVEL: 'DEBUG'
+      APP_SECRET: "$$2a$$10$$HuxYWte8dvZJM9UHBMEFZO" # TODO: Centralize this
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:3.7.1
+    networks:
+      - backend
+  tests:
+    build: ./tests
+    environment:
+      CYPRESS_BASE_URL: http://app
+      MONGO_HOST: mongo
+      DB_NAME: jawn_test
+    networks:
+      - backend
+    volumes:
+      - ./tests/cypress/videos:/home/app/tests/cypress/videos
+      - ./tests/cypress/screenshots:/home/app/tests/cypress/screenshots
+    depends_on:
+      - mongo
+      - app
+networks:
+  backend:
