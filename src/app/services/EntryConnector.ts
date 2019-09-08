@@ -2,6 +2,7 @@ import { MongoStore } from 'app/services/MongoService';
 import LoggerService from 'app/services/LoggerService';
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import moment from 'moment';
+import { ObjectID } from 'mongodb';
 
 const LOG_TAG = 'EntryConnector';
 
@@ -59,9 +60,16 @@ export default class EntryConnector {
   listByUser(userId: string, options: ListByUserInputParams = {}) {
     this.logger.debug({ options }, LOG_TAG);
 
-    const query = {
-      userId,
-      _id: {},
+    interface Query {
+      userId: string;
+      _id?: {
+        $gt?: ObjectID;
+        $lt?: ObjectID;
+      }
+    }
+
+    const query: Query = {
+      userId
     };
 
     if (options.since) {
