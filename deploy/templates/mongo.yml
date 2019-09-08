@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: workspace-mongo
+spec:
+  type: ClusterIP
+  ports:
+  - port: 27017
+    name: workspace-mongo
+  selector:
+    app: workspace-mongo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workspace-mongo
+spec:
+  selector:
+    matchLabels:
+      app: workspace-mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: workspace-mongo
+        version: '3'
+    spec:
+      containers:
+      - name: workspace-mongo
+        image: mongo:3.7.1
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+          - name: mongo-persistent-storage
+            mountPath: /data/db
+      volumes:
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mongo-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

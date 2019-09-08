@@ -1,0 +1,4 @@
+relicas: 1
+name: jawn-workspace-api
+image: jasonblanchard/jawn-workspace-api
+port: 8080

@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v1
+      kind:  Mapping
+      name:  workspace_mapping
+      prefix: /api/workspace/
+      service: {{ .Values.name }}:{{ .Values.port }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: {{ .Values.port }}
+    name: http
+  selector:
+    app: {{ .Values.name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+        version: '1'
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: {{ .Values.image }}:{{ .Values.version }}
+        env:
+          - name: 'PORT'
+            value: '{{ .Values.port }}'
+          - name: 'MONGO_HOST'
+            value: 'workspace-mongo'
+          - name: 'DB_NAME'
+            value: 'jawn'
+          - name: 'LOG_LEVEL'
+            value: 'DEBUG'
+          - name: 'JWT_SECRET'
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: jwtSecret
+        ports:
+        - containerPort: {{ .Values.port }}
+        readinessProbe:
+          httpGet:
+             path: /health
+             port: {{ .Values.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
