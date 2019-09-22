@@ -11,19 +11,19 @@ spec:
     app: workspace-mongo
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: workspace-mongo
 spec:
+  serviceName: workspace-mongo
+  replicas: 1
   selector:
     matchLabels:
       app: workspace-mongo
-  replicas: 1
   template:
     metadata:
       labels:
         app: workspace-mongo
-        version: '3'
     spec:
       containers:
       - name: workspace-mongo
@@ -31,36 +31,14 @@ spec:
         ports:
         - containerPort: 27017
         volumeMounts:
-          - name: mongo-persistent-storage
+          - name: jawn-workspace-api
             mountPath: /data/db
-      volumes:
-        - name: mongo-persistent-storage
-          persistentVolumeClaim:
-            claimName: mongo-pv-claim
----
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: mongo-pv-volume
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/mnt/data"
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mongo-pv-claim
-spec:
-  storageClassName: manual
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: jawn-workspace-api
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1G
