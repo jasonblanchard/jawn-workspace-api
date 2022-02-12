@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.3",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-server-express": "^1.4.0",
     "bcrypt": "3.0.2",
